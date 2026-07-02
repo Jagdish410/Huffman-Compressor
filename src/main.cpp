@@ -2,6 +2,7 @@
 #include "FileReader.h"
 #include "HuffmanTree.h"
 #include "Compressor.h"
+#include "Decoder.h"
 
 int main()
 {
@@ -13,7 +14,7 @@ int main()
         return 1;
     }
 
-    const int* freq = reader.getFrequency();
+    const int *freq = reader.getFrequency();
 
     HuffmanTree tree;
 
@@ -32,6 +33,19 @@ int main()
         freq);
 
     std::cout << "Compression Successful!" << std::endl;
+
+    Decoder decoder;
+
+    if (decoder.decompress(
+            "output/sample.huff",
+            "output/sample_decoded.txt"))
+    {
+        std::cout << "Decoder successfully read compressed file." << std::endl;
+    }
+    else
+    {
+        std::cout << "Decoder failed." << std::endl;
+    }
 
     return 0;
 }
