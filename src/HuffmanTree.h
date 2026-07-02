@@ -3,6 +3,8 @@
 
 #include <queue>
 #include <vector>
+#include <unordered_map>
+#include <string>
 
 class Node
 {
@@ -30,7 +32,11 @@ class HuffmanTree
 private:
     Node* root;
 
+    std::unordered_map<unsigned char, std::string> codes;
+
     void print(Node* node, int depth) const;
+
+    void generateCodes(Node* node, std::string code);
 
 public:
     HuffmanTree();
@@ -40,6 +46,10 @@ public:
     Node* getRoot() const;
 
     void printTree() const;
+
+    void generateCodes();
+
+    const std::unordered_map<unsigned char, std::string>& getCodes() const;
 };
 
 #endif

@@ -83,3 +83,34 @@ void HuffmanTree::print(Node* node, int depth) const
     print(node->left, depth + 1);
     print(node->right, depth + 1);
 }
+
+void HuffmanTree::generateCodes()
+{
+    codes.clear();
+
+    generateCodes(root, "");
+}
+
+void HuffmanTree::generateCodes(Node* node, std::string code)
+{
+    if (node == nullptr)
+    {
+        return;
+    }
+
+    // Leaf node
+    if (node->left == nullptr && node->right == nullptr)
+    {
+        codes[node->data] = code;
+        return;
+    }
+
+    generateCodes(node->left, code + "0");
+
+    generateCodes(node->right, code + "1");
+}
+
+const std::unordered_map<unsigned char, std::string>& HuffmanTree::getCodes() const
+{
+    return codes;
+}

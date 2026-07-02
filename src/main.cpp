@@ -18,9 +18,16 @@ int main()
 
     tree.buildTree(freq);
 
-    std::cout << "Huffman Tree:\n\n";
+    tree.generateCodes();
 
-    tree.printTree();
+    const std::unordered_map<unsigned char, std::string>& codes = tree.getCodes();
+
+    std::cout << "Huffman Codes:\n\n";
+
+    for (const auto& pair : codes)
+    {
+        std::cout << pair.first << " : " << pair.second << std::endl;
+    }
 
     return 0;
 }
