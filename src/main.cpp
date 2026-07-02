@@ -1,6 +1,7 @@
 #include <iostream>
 #include "FileReader.h"
 #include "HuffmanTree.h"
+#include "Compressor.h"
 
 int main()
 {
@@ -20,14 +21,14 @@ int main()
 
     tree.generateCodes();
 
-    const std::unordered_map<unsigned char, std::string>& codes = tree.getCodes();
+    Compressor compressor;
 
-    std::cout << "Huffman Codes:\n\n";
+    std::string encodedData =
+        compressor.compress("sample/sample.txt", tree.getCodes());
 
-    for (const auto& pair : codes)
-    {
-        std::cout << pair.first << " : " << pair.second << std::endl;
-    }
+    std::cout << "Encoded Bit Stream:\n\n";
+
+    std::cout << encodedData << std::endl;
 
     return 0;
 }
