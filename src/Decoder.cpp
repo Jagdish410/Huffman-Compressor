@@ -17,9 +17,26 @@ bool Decoder::decompress(
     }
 
     // Read frequency table
-    int freq[256];
+    // Initialize frequency table
+    int freq[256] = {0};
 
-    in.read(reinterpret_cast<char *>(freq), 256 * sizeof(int));
+    // Read number of unique characters
+    int uniqueCount;
+
+    in.read(reinterpret_cast<char *>(&uniqueCount), sizeof(int));
+
+    // Read only the used characters
+    for (int i = 0; i < uniqueCount; i++)
+    {
+        unsigned char ch;
+        int frequency;
+
+        in.read(reinterpret_cast<char *>(&ch), sizeof(unsigned char));
+
+        in.read(reinterpret_cast<char *>(&frequency), sizeof(int));
+
+        freq[ch] = frequency;
+    }
 
     // Read padding information
     unsigned char padding;
@@ -80,8 +97,6 @@ bool Decoder::decompress(
     }
 
     out.close();
-
-    
 
     in.close();
 

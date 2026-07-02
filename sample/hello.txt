@@ -1,0 +1,3 @@
+Hello World!
+This is my Huffman Compressor.
+I am testing compression and decompression.

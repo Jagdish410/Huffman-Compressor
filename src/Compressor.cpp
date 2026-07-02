@@ -4,8 +4,8 @@
 #include <bitset>
 
 std::string Compressor::compress(
-    const std::string& filename,
-    const std::unordered_map<unsigned char, std::string>& codes)
+    const std::string &filename,
+    const std::unordered_map<unsigned char, std::string> &codes)
 {
     std::ifstream file(filename, std::ios::binary);
 
@@ -18,7 +18,7 @@ std::string Compressor::compress(
 
     unsigned char byte;
 
-    while (file.read(reinterpret_cast<char*>(&byte), 1))
+    while (file.read(reinterpret_cast<char *>(&byte), 1))
     {
         encodedData += codes.at(byte);
     }
@@ -29,8 +29,8 @@ std::string Compressor::compress(
 }
 
 void Compressor::writeCompressedFile(
-    const std::string& outputFile,
-    const std::string& encodedData,
+    const std::string &outputFile,
+    const std::string &encodedData,
     const int freq[])
 {
     std::ofstream out(outputFile, std::ios::binary);
@@ -41,7 +41,31 @@ void Compressor::writeCompressedFile(
     }
 
     // Write frequency table (256 integers)
-    out.write(reinterpret_cast<const char*>(freq), 256 * sizeof(int));
+    int uniqueCount = 0;
+
+    for (int i = 0; i < 256; i++)
+    {
+        if (freq[i] > 0)
+        {
+            uniqueCount++;
+        }
+    }
+
+    // Write number of unique characters
+    out.write(reinterpret_cast<char *>(&uniqueCount), sizeof(int));
+
+    // Write only used characters and their frequencies
+    for (int i = 0; i < 256; i++)
+    {
+        if (freq[i] > 0)
+        {
+            unsigned char ch = static_cast<unsigned char>(i);
+
+            out.write(reinterpret_cast<char *>(&ch), sizeof(unsigned char));
+
+            out.write(reinterpret_cast<const char *>(&freq[i]), sizeof(int));
+        }
+    }
 
     std::string bits = encodedData;
 
@@ -50,7 +74,7 @@ void Compressor::writeCompressedFile(
 
     // Write padding information
     unsigned char paddingByte = static_cast<unsigned char>(padding);
-    out.write(reinterpret_cast<char*>(&paddingByte), 1);
+    out.write(reinterpret_cast<char *>(&paddingByte), 1);
 
     // Add padding bits
     while (bits.size() % 8 != 0)
@@ -66,7 +90,7 @@ void Compressor::writeCompressedFile(
         unsigned char value =
             static_cast<unsigned char>(byte.to_ulong());
 
-        out.write(reinterpret_cast<char*>(&value), 1);
+        out.write(reinterpret_cast<char *>(&value), 1);
     }
 
     out.close();
