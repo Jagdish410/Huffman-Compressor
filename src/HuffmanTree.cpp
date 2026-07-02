@@ -114,3 +114,22 @@ const std::unordered_map<unsigned char, std::string>& HuffmanTree::getCodes() co
 {
     return codes;
 }
+
+HuffmanTree::~HuffmanTree()
+{
+    deleteTree(root);
+}
+
+void HuffmanTree::deleteTree(Node* node)
+{
+    if (node == nullptr)
+    {
+        return;
+    }
+
+    deleteTree(node->left);
+
+    deleteTree(node->right);
+
+    delete node;
+}

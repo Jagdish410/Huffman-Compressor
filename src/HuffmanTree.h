@@ -38,8 +38,12 @@ private:
 
     void generateCodes(Node* node, std::string code);
 
+    void deleteTree(Node* node);
+
 public:
     HuffmanTree();
+
+    ~HuffmanTree();
 
     void buildTree(const int freq[]);
 
@@ -51,5 +55,6 @@ public:
 
     const std::unordered_map<unsigned char, std::string>& getCodes() const;
 };
+
 
 #endif
