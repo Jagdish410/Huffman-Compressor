@@ -26,9 +26,12 @@ int main()
     std::string encodedData =
         compressor.compress("sample/sample.txt", tree.getCodes());
 
-    std::cout << "Encoded Bit Stream:\n\n";
+    compressor.writeCompressedFile(
+        "output/sample.huff",
+        encodedData,
+        freq);
 
-    std::cout << encodedData << std::endl;
+    std::cout << "Compression Successful!" << std::endl;
 
     return 0;
 }
