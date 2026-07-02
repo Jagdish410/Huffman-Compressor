@@ -1,5 +1,6 @@
 #include <iostream>
 #include "FileReader.h"
+#include "HuffmanTree.h"
 
 int main()
 {
@@ -13,13 +14,13 @@ int main()
 
     const int* freq = reader.getFrequency();
 
-    for (int i = 0; i < 256; i++)
-    {
-        if (freq[i] > 0)
-        {
-            std::cout << (char)i << " : " << freq[i] << '\n';
-        }
-    }
+    HuffmanTree tree;
+
+    tree.buildTree(freq);
+
+    std::cout << "Huffman Tree:\n\n";
+
+    tree.printTree();
 
     return 0;
 }
