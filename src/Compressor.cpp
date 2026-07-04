@@ -1,21 +1,22 @@
 #include "Compressor.h"
-
 #include <fstream>
-#include <bitset>
 
-std::string Compressor::compress(
-    const std::string &filename,
-    const std::unordered_map<unsigned char, std::string> &codes)
+using std::string;
+using std::ifstream;
+using std::ofstream;
+using std::ios;
+
+string Compressor::compress(
+    const string &filename,
+    const std::unordered_map<unsigned char, string> &codes)
 {
-    std::ifstream file(filename, std::ios::binary);
-
+    ifstream file(filename, ios::binary);
     if (!file)
     {
         return "";
     }
 
-    std::string encodedData;
-
+    string encodedData;
     unsigned char byte;
 
     while (file.read(reinterpret_cast<char *>(&byte), 1))
@@ -24,25 +25,22 @@ std::string Compressor::compress(
     }
 
     file.close();
-
     return encodedData;
 }
 
 void Compressor::writeCompressedFile(
-    const std::string &outputFile,
-    const std::string &encodedData,
+    const string &outputFile,
+    const string &encodedData,
     const int freq[])
 {
-    std::ofstream out(outputFile, std::ios::binary);
-
+    ofstream out(outputFile, ios::binary);
     if (!out)
     {
         return;
     }
 
-    // Write frequency table (256 integers)
+    // 1. Write metadata (Unique character count)
     int uniqueCount = 0;
-
     for (int i = 0; i < 256; i++)
     {
         if (freq[i] > 0)
@@ -51,46 +49,50 @@ void Compressor::writeCompressedFile(
         }
     }
 
-    // Write number of unique characters
     out.write(reinterpret_cast<char *>(&uniqueCount), sizeof(int));
 
-    // Write only used characters and their frequencies
+    // 2. Write character-frequency pairs
     for (int i = 0; i < 256; i++)
     {
         if (freq[i] > 0)
         {
             unsigned char ch = static_cast<unsigned char>(i);
-
             out.write(reinterpret_cast<char *>(&ch), sizeof(unsigned char));
-
             out.write(reinterpret_cast<const char *>(&freq[i]), sizeof(int));
         }
     }
 
-    std::string bits = encodedData;
-
-    // Calculate padding
-    int padding = (8 - (bits.size() % 8)) % 8;
-
-    // Write padding information
+    // 3. Calculate and write padding information
+    int padding = (8 - (encodedData.size() % 8)) % 8;
     unsigned char paddingByte = static_cast<unsigned char>(padding);
     out.write(reinterpret_cast<char *>(&paddingByte), 1);
 
-    // Add padding bits
-    while (bits.size() % 8 != 0)
+    // 4. Stream and pack bits using fast bitwise operations
+    unsigned char bitBuffer = 0;
+    int bitCount = 0;
+
+    for (char bit : encodedData)
     {
-        bits += '0';
+        bitBuffer <<= 1;
+        if (bit == '1')
+        {
+            bitBuffer |= 1;
+        }
+        bitCount++;
+
+        if (bitCount == 8)
+        {
+            out.write(reinterpret_cast<char *>(&bitBuffer), 1);
+            bitBuffer = 0;
+            bitCount = 0;
+        }
     }
 
-    // Write compressed data
-    for (size_t i = 0; i < bits.size(); i += 8)
+    // Handle remaining bits at the end
+    if (bitCount > 0)
     {
-        std::bitset<8> byte(bits.substr(i, 8));
-
-        unsigned char value =
-            static_cast<unsigned char>(byte.to_ulong());
-
-        out.write(reinterpret_cast<char *>(&value), 1);
+        bitBuffer <<= (8 - bitCount);
+        out.write(reinterpret_cast<char *>(&bitBuffer), 1);
     }
 
     out.close();
