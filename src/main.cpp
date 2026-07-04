@@ -7,9 +7,11 @@
 #include "Compressor.h"
 #include "Decoder.h"
 
-long long getFileSize(const std::string &filename)
+using namespace std;
+
+long long getFileSize(const string &filename)
 {
-    std::ifstream file(filename, std::ios::binary | std::ios::ate);
+    ifstream file(filename, ios::binary | ios::ate);
 
     if (!file)
     {
@@ -23,15 +25,15 @@ int main(int argc, char *argv[])
 {
     if (argc != 4)
     {
-        std::cout << "Usage:\n";
-        std::cout << "./huffman compress <input_file> <output_file>\n";
-        std::cout << "./huffman decompress <input_file> <output_file>\n";
+        cout << "Usage:\n";
+        cout << "./huffman compress <input_file> <output_file>\n";
+        cout << "./huffman decompress <input_file> <output_file>\n";
         return 1;
     }
 
-    std::string mode = argv[1];
-    std::string inputFile = argv[2];
-    std::string outputFile = argv[3];
+    string mode = argv[1];
+    string inputFile = argv[2];
+    string outputFile = argv[3];
 
     if (mode == "compress")
     {
@@ -39,21 +41,27 @@ int main(int argc, char *argv[])
 
         if (!reader.readFile(inputFile))
         {
-            std::cout << "Unable to open input file.\n";
+            cout << "Unable to open input file.\n";
+            return 1;
+        }
+
+        long long originalSize = getFileSize(inputFile);
+
+        if (originalSize == 0)
+        {
+            cout << "Input file is empty.\n";
             return 1;
         }
 
         const int *freq = reader.getFrequency();
 
         HuffmanTree tree;
-
         tree.buildTree(freq);
-
         tree.generateCodes();
 
         Compressor compressor;
 
-        std::string encodedData =
+        string encodedData =
             compressor.compress(inputFile, tree.getCodes());
 
         compressor.writeCompressedFile(
@@ -61,37 +69,19 @@ int main(int argc, char *argv[])
             encodedData,
             freq);
 
-        long long originalSize = getFileSize(inputFile);
-
         long long compressedSize = getFileSize(outputFile);
 
         double ratio =
             (static_cast<double>(compressedSize) / originalSize) * 100.0;
 
-        std::cout << "\nCompression Successful!\n\n";
+        cout << fixed << setprecision(2);
 
-        std::cout << "Input File       : "
-                  << inputFile
-                  << '\n';
-
-        std::cout << "Output File      : "
-                  << outputFile
-                  << '\n';
-
-        std::cout << "Original Size    : "
-                  << originalSize
-                  << " bytes\n";
-
-        std::cout << "Compressed Size  : "
-                  << compressedSize
-                  << " bytes\n";
-
-        std::cout << std::fixed
-                  << std::setprecision(2);
-
-        std::cout << "Compression Ratio: "
-                  << ratio
-                  << "%\n";
+        cout << "\nCompression Successful!\n\n";
+        cout << "Input File       : " << inputFile << '\n';
+        cout << "Output File      : " << outputFile << '\n';
+        cout << "Original Size    : " << originalSize << " bytes\n";
+        cout << "Compressed Size  : " << compressedSize << " bytes\n";
+        cout << "Compression Ratio: " << ratio << "%\n";
     }
     else if (mode == "decompress")
     {
@@ -99,16 +89,16 @@ int main(int argc, char *argv[])
 
         if (decoder.decompress(inputFile, outputFile))
         {
-            std::cout << "Decompression Successful!" << std::endl;
+            cout << "Decompression Successful!\n";
         }
         else
         {
-            std::cout << "Decompression Failed!" << std::endl;
+            cout << "Decompression Failed!\n";
         }
     }
     else
     {
-        std::cout << "Invalid mode.\n";
+        cout << "Invalid mode.\n";
         return 1;
     }
 

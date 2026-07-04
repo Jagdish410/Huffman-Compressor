@@ -1,74 +1,115 @@
 #include "Decoder.h"
 #include "HuffmanTree.h"
-#include <fstream>
-#include <iostream>
 
-using std::string;
+#include <fstream>
+
 using std::ifstream;
-using std::ofstream;
 using std::ios;
+using std::ofstream;
+using std::string;
 
 bool Decoder::decompress(
     const string &inputFile,
     const string &outputFile)
 {
     ifstream in(inputFile, ios::binary);
+
     if (!in)
     {
         return false;
     }
 
-    // 1. Read frequency table metadata
     int freq[256] = {0};
+
     int uniqueCount;
-    in.read(reinterpret_cast<char *>(&uniqueCount), sizeof(int));
+
+    if (!in.read(reinterpret_cast<char *>(&uniqueCount), sizeof(int)))
+    {
+        return false;
+    }
 
     for (int i = 0; i < uniqueCount; i++)
     {
         unsigned char ch;
         int frequency;
 
-        in.read(reinterpret_cast<char *>(&ch), sizeof(unsigned char));
-        in.read(reinterpret_cast<char *>(&frequency), sizeof(int));
+        if (!in.read(reinterpret_cast<char *>(&ch), sizeof(unsigned char)))
+        {
+            return false;
+        }
+
+        if (!in.read(reinterpret_cast<char *>(&frequency), sizeof(int)))
+        {
+            return false;
+        }
 
         freq[ch] = frequency;
     }
 
-    // 2. Read padding information
     unsigned char padding;
-    in.read(reinterpret_cast<char *>(&padding), 1);
 
-    // 3. Rebuild the exact Huffman Tree
+    if (!in.read(reinterpret_cast<char *>(&padding), 1))
+    {
+        return false;
+    }
+
     HuffmanTree tree;
     tree.buildTree(freq);
 
+    Node *root = tree.getRoot();
+
+    if (root == nullptr)
+    {
+        return false;
+    }
+
     ofstream out(outputFile, ios::binary);
+
     if (!out)
     {
         return false;
     }
 
-    // 4. Calculate total bytes remaining to perfectly manage the final padding bits
     long currentPos = in.tellg();
+
     in.seekg(0, ios::end);
     long endPos = in.tellg();
+
     long compressedBytesCount = endPos - currentPos;
+
     in.seekg(currentPos, ios::beg);
 
-    Node *current = tree.getRoot();
+    // Handle files containing only one unique character
+    if (root->left == nullptr && root->right == nullptr)
+    {
+        for (int i = 0; i < 256; i++)
+        {
+            if (freq[i] > 0)
+            {
+                for (int j = 0; j < freq[i]; j++)
+                {
+                    out.put(static_cast<char>(i));
+                }
+                return true;
+            }
+        }
+    }
+
+    Node *current = root;
     unsigned char byte;
 
-    // 5. Read compressed data byte-by-byte and process bits directly via fast bit shifting
-    for (long i = 0; i < compressedBytesCount; ++i)
+    for (long i = 0; i < compressedBytesCount; i++)
     {
-        in.read(reinterpret_cast<char *>(&byte), 1);
-        
-        // If this is the absolute last byte, skip the padded junk bits
-        int bitsToProcess = (i == compressedBytesCount - 1) ? (8 - padding) : 8;
-
-        for (int b = 7; b >= (8 - bitsToProcess); --b)
+        if (!in.read(reinterpret_cast<char *>(&byte), 1))
         {
-            // Extract the single bit at position 'b'
+            return false;
+        }
+
+        int bitsToProcess =
+            (i == compressedBytesCount - 1) ? (8 - padding) : 8;
+
+        for (int b = 7; b >= (8 - bitsToProcess); b--)
+        {
             int bit = (byte >> b) & 1;
 
             if (bit == 0)
@@ -80,16 +121,18 @@ bool Decoder::decompress(
                 current = current->right;
             }
 
-            // Once a leaf node is hit, write out the decoded character and reset to root
+            if (current == nullptr)
+            {
+                return false;
+            }
+
             if (current->left == nullptr && current->right == nullptr)
             {
                 out.put(static_cast<char>(current->data));
-                current = tree.getRoot();
+                current = root;
             }
         }
     }
 
-    out.close();
-    in.close();
     return true;
 }

@@ -11,9 +11,9 @@ private:
 public:
     FileReader();
 
-    bool readFile(const std::string& filename);
+    bool readFile(const std::string &filename);
 
-    const int* getFrequency() const;
+    const int *getFrequency() const;
 };
 
 #endif

@@ -10,8 +10,13 @@ FileReader::FileReader()
     }
 }
 
-bool FileReader::readFile(const std::string& filename)
+bool FileReader::readFile(const std::string &filename)
 {
+    for (int i = 0; i < 256; i++)
+    {
+        freq[i] = 0;
+    }
+
     std::ifstream file(filename, std::ios::binary);
 
     if (!file)
@@ -21,17 +26,15 @@ bool FileReader::readFile(const std::string& filename)
 
     unsigned char byte;
 
-    while (file.read(reinterpret_cast<char*>(&byte), 1))
+    while (file.read(reinterpret_cast<char *>(&byte), 1))
     {
         freq[byte]++;
     }
 
-    file.close();
-
     return true;
 }
 
-const int* FileReader::getFrequency() const
+const int *FileReader::getFrequency() const
 {
     return freq;
 }
