@@ -1,76 +1,37 @@
-# Huffman File Compressor
+# ⚡ Huffman File Compressor
 
-A lossless file compression and decompression tool written in C++ using the Huffman Coding algorithm.
+A full-stack, lossless file compression web application implementing the **Huffman Coding algorithm** in **C++**, with a lightweight **Flask** web interface for seamless compression and decompression.
 
-## Features
+[🌐 Live Demo](https://huffman-compressor-5rzd.onrender.com) | [👨‍💻 Author Profile](https://github.com/Jagdish410)
 
-- Compress any file using Huffman Coding
-- Decompress files back to their original form
-- Command-line interface
-- Binary file handling
-- Automatic Huffman tree construction
-- Variable-length binary encoding
-- Lossless compression
+---
 
-## Project Structure
+## 🚀 Quick Look
 
-```
-Huffman-Compressor/
-│
-├── src/
-├── sample/
-├── output/
-├── README.md
-└── .gitignore
-```
+| Core Features | Technical Overview |
+| :--- | :--- |
+| • Lossless compression & decompression<br>• Real-time efficiency metrics<br>• Automated temporary file cleanup<br>• Supported Formats: `.txt`, `.csv`, `.pdf`, `.png` | **Backend:** C++17, Flask, Gunicorn<br>**Frontend:** JavaScript,, Bootstrap 5<br>**Deployment:** Render Cloud |
 
-## Build
+### 📊 Performance Benchmarks
+* **Plain Text (`.txt`):** Compresses down to **~59%** of original size.
+* **Structured Data (`.csv`):** Compresses down to **~62%** of original size.
+> *Note: Already-compressed formats (PNG, JPG, PDF, ZIP) will yield minimal savings due to high baseline entropy.*
 
-```bash
-g++ -std=c++17 src/*.cpp -o huffman
-```
+---
 
-## Usage
+## 🧠 How it Works
 
-Compress
+1. **Frequency Analysis:** Scans the input stream to calculate exact byte occurrences.
+2. **Tree Generation:** Builds a binary tree assigning shorter bit-sequences to higher-frequency bytes using a priority queue.
+3. **Serialization:** Packs the compressed bitstream alongside metadata required for exact bit-for-bit reconstruction during decoding.
 
-```bash
-./huffman compress input.txt output.huff
-```
+---
 
-Decompress
+## 👨‍💻 Author
 
-```bash
-./huffman decompress output.huff recovered.txt
-```
+**Jagdish**
 
-## Algorithm
+Electrical Engineering Undergraduate  
+IIT Gandhinagar
 
-1. Read the input file.
-2. Count the frequency of every byte.
-3. Build the Huffman Tree using a priority queue.
-4. Generate Huffman codes.
-5. Encode the file into a binary bitstream.
-6. Store the compressed data and metadata.
-7. Reconstruct the Huffman tree during decompression.
-8. Recover the original file exactly.
-
-## Technologies
-
-- C++
-- STL
-- Priority Queue
-- Binary File I/O
-- Object-Oriented Programming
-
-## Future Improvements
-
-- Store Huffman tree instead of frequencies.
-- Reduce metadata size.
-- Better compression for small files.
-- GUI / Web interface.
-- Canonical Huffman Coding.
-
-## Author
-
-Jagdish
+⭐ If you found this project useful, consider giving it a star on GitHub!
