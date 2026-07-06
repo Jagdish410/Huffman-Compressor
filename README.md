@@ -13,18 +13,31 @@ A full-stack, lossless file compression web application implementing the **Huffm
 | • Lossless compression & decompression<br>• Real-time efficiency metrics<br>• Automated temporary file cleanup<br>• Supported Formats: `.txt`, `.csv`, `.pdf`, `.png` | **Backend:** C++17, Flask, Gunicorn<br>**Frontend:** JavaScript,, Bootstrap 5<br>**Deployment:** Render Cloud |
 
 ### 📊 Performance Benchmarks
-* **Plain Text (`.txt`):** Compresses down to **~59%** of original size.
-* **Structured Data (`.csv`):** Compresses down to **~62%** of original size.
-> *Note: Already-compressed formats (PNG, JPG, PDF, ZIP) will yield minimal savings due to high baseline entropy.*
 
+* **Sample Text File (`.txt`):** Reduced to **~59%** of its original size.
+* **Sample CSV File (`.csv`):** Reduced to **~62%** of its original size.
+
+> Results vary depending on file content and data redundancy. Already-compressed formats (PNG, JPG, PDF, ZIP, etc.) may show little or no size reduction.
 ---
 
 ## 🧠 How it Works
 
-1. **Frequency Analysis:** Scans the input stream to calculate exact byte occurrences.
-2. **Tree Generation:** Builds a binary tree assigning shorter bit-sequences to higher-frequency bytes using a priority queue.
-3. **Serialization:** Packs the compressed bitstream alongside metadata required for exact bit-for-bit reconstruction during decoding.
 
+1. **Frequency Analysis**  
+   The input file is scanned byte-by-byte to calculate the frequency of every unique character.
+
+2. **Huffman Tree Construction**  
+   A priority queue is used to build the Huffman Tree, where characters with lower frequencies are placed deeper in the tree and frequent characters receive shorter paths.
+
+3. **Code Generation**  
+   Each character is assigned a unique variable-length binary code by traversing the Huffman Tree, ensuring lossless encoding.
+
+4. **Compression**  
+   The original file is converted into a compressed bitstream using the generated Huffman codes. The frequency table is stored in the compressed file so it can be reconstructed later.
+
+5. **Decompression**  
+   During decompression, the stored frequency table is used to rebuild the Huffman Tree. The encoded bitstream is then decoded to recreate the original file exactly.
+   
 ---
 
 ## 👨‍💻 Author
