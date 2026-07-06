@@ -10,14 +10,15 @@ A full-stack, lossless file compression web application implementing the **Huffm
 
 | Core Features | Technical Overview |
 | :--- | :--- |
-| • Lossless compression & decompression<br>• Real-time efficiency metrics<br>• Automated temporary file cleanup<br>• Supported Formats: `.txt`, `.csv`, `.pdf`, `.png` | **Backend:** C++17, Flask, Gunicorn<br>**Frontend:** JavaScript,, Bootstrap 5<br>**Deployment:** Render Cloud |
+| • Lossless compression & decompression<br>• Real-time efficiency metrics<br>• Automated temporary file cleanup<br>• Supported Formats: `.txt`, `.csv`, `.pdf`, `.png`, `.jpg`, `.docx`, `.bin` | **Backend:** C++17, Flask, Gunicorn<br>**Frontend:** HTML5, CSS3, JavaScript, Bootstrap 5<br>**Deployment:** Render Cloud |
 
 ### 📊 Performance Benchmarks
 
 * **Sample Text File (`.txt`):** Reduced to **~59%** of its original size.
 * **Sample CSV File (`.csv`):** Reduced to **~62%** of its original size.
 
-> Results vary depending on file content and data redundancy. Already-compressed formats (PNG, JPG, PDF, ZIP, etc.) may show little or no size reduction.
+> **Note:** Results vary depending on file content and data redundancy. Already-compressed formats (PNG, JPG, PDF, ZIP, etc.) may show little or no size reduction.
+
 ---
 
 ## 🧠 How it Works
@@ -38,6 +39,18 @@ A full-stack, lossless file compression web application implementing the **Huffm
 5. **Decompression**  
    During decompression, the stored frequency table is used to rebuild the Huffman Tree. The encoded bitstream is then decoded to recreate the original file exactly.
    
+---
+
+## ⚠️ Limitations
+
+Although Huffman Coding is an efficient lossless compression algorithm, it has some practical limitations:
+
+- **Compression depends on the input data.** Files with repetitive patterns (such as `.txt` and `.csv`) usually achieve better compression, while files with more random data may show lower compression ratios.
+
+- **Already compressed files gain little or no benefit.** Formats such as `.png`, `.jpg`, `.pdf`, `.zip`, and `.mp4` already use compression techniques internally, so applying Huffman Coding again often provides minimal size reduction and may even slightly increase the file size.
+
+- **Metadata introduces overhead.** To ensure lossless decompression, the compressed file stores the frequency table required to reconstruct the Huffman Tree. For very small files, this additional metadata can make the compressed file slightly larger than the original.
+
 ---
 
 ## 👨‍💻 Author
