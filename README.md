@@ -59,5 +59,3 @@ Although Huffman Coding is an efficient lossless compression algorithm, it has s
 
 Electrical Engineering Undergraduate  
 IIT Gandhinagar
-
-⭐ If you found this project useful, consider giving it a star on GitHub!
