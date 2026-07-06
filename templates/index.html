@@ -130,10 +130,19 @@
 
                             <input type="file" name="file" id="file_input" class="form-control mb-3" required>
 
-                            <a id="sample_button" href="{{ url_for('static', filename='sample.txt') }}"
-                                class="btn btn-outline-secondary mb-3" download>
-                                Download Sample Text File
-                            </a>
+                            <div id="sample_buttons">
+
+                                <a href="{{ url_for('static', filename='sample.txt') }}"
+                                    class="btn btn-outline-secondary mb-2 d-block" download>
+                                    📄 Download Sample Text File
+                                </a>
+
+                                <a href="{{ url_for('static', filename='sample_employees.csv') }}"
+                                    class="btn btn-outline-success mb-3 d-block" download>
+                                    📊 Download Sample CSV File
+                                </a>
+
+                            </div>
 
                             <p class="text-muted small mb-0" id="upload_note">
                                 💡 Best compression results are achieved with plain text (.txt) files.
@@ -159,7 +168,6 @@
                     </h5>
 
                     <div class="row g-3 mb-3">
-
                         <div class="col-6">
 
                             <div class="metric-box">
@@ -222,28 +230,26 @@
 
     </div>
 
-
     <script>
 
         const compress = document.getElementById("mode_compress");
         const decompress = document.getElementById("mode_decompress");
         const note = document.getElementById("upload_note");
-        const sampleButton = document.getElementById("sample_button");
+        const sampleButtons = document.getElementById("sample_buttons");
 
         function updateNote() {
 
             if (compress.checked) {
 
-                sampleButton.style.display = "block";
-                sampleButton.style.margin = "0 auto 1rem auto";
+                sampleButtons.style.display = "block";
 
                 note.innerHTML =
-                    "💡 Upload any supported file (.txt, .pdf, .png, .jpg, .csv, .bin, etc.) for compression.<br><br><strong>Best compression results are achieved with plain text (.txt) files.</strong> Already compressed files such as PDF, JPG, PNG and ZIP may show little or no size reduction.";
+                    "💡 Upload any supported file (.txt, .csv, .pdf, .png, .jpg, .docx, .bin, etc.) for compression.<br><br><strong>Best compression results are achieved with text-based files such as .txt, .csv, .cpp and .h.</strong> Already compressed formats like PDF, JPG, PNG and ZIP may show little or no size reduction.";
 
             }
             else {
 
-                sampleButton.style.display = "none";
+                sampleButtons.style.display = "none";
 
                 note.innerHTML =
                     "🔓 <strong>Please upload only a .huff file for decompression.</strong>";
@@ -251,6 +257,7 @@
             }
 
         }
+        
         compress.addEventListener("change", updateNote);
         decompress.addEventListener("change", updateNote);
 
