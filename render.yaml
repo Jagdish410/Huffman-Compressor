@@ -1,0 +1,6 @@
+services:
+  - type: web
+    name: Huffman-Compressor
+    env: python
+    buildCommand: chmod +x build.sh && ./build.sh
+    startCommand: gunicorn app:app
