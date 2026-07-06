@@ -1,5 +1,8 @@
 import os
+import time
+import threading
 import subprocess
+import platform
 
 from flask import (
     Flask,
@@ -35,6 +38,24 @@ app.config["OUTPUT_FOLDER"] = OUTPUT_FOLDER
 
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 os.makedirs(OUTPUT_FOLDER, exist_ok=True)
+
+def cleanup_files(file_path, upload_path, exact_upload):
+
+    time.sleep(30)
+
+    try:
+
+        if os.path.exists(file_path):
+            os.remove(file_path)
+
+        if os.path.exists(upload_path):
+            os.remove(upload_path)
+
+        if os.path.exists(exact_upload):
+            os.remove(exact_upload)
+
+    except Exception as e:
+        app.logger.error(str(e))
 
 
 def allowed_file(filename):
@@ -94,7 +115,7 @@ def index():
             output_filename
         )
 
-        cpp_executable = "./huffman.exe"
+        cpp_executable = "./huffman.exe" if platform.system() == "Windows" else "./huffman"
 
         operation = "compress" if mode == "compress" else "decompress"
 
@@ -160,7 +181,6 @@ def index():
     download_file=download_file
 )
 
-
 @app.route("/download/<filename>")
 def download(filename):
 
@@ -172,46 +192,36 @@ def download(filename):
     if not os.path.exists(file_path):
         return "File not found.", 404
 
-    response = send_file(
+    if filename.endswith(".huff"):
+        upload_name = filename[:-5]
+    else:
+        upload_name = filename + ".huff"
+
+    upload_path = os.path.join(
+        UPLOAD_FOLDER,
+        upload_name
+    )
+
+    exact_upload = os.path.join(
+        UPLOAD_FOLDER,
+        filename
+    )
+
+    threading.Thread(
+        target=cleanup_files,
+        args=(
+            file_path,
+            upload_path,
+            exact_upload
+        ),
+        daemon=True
+    ).start()
+
+    return send_file(
         file_path,
         as_attachment=True,
         download_name=filename
     )
-
-    @response.call_on_close
-    def cleanup():
-
-        try:
-
-            if os.path.exists(file_path):
-                os.remove(file_path)
-
-            if filename.endswith(".huff"):
-                upload_name = filename[:-5]
-            else:
-                upload_name = filename + ".huff"
-
-            upload_path = os.path.join(
-                UPLOAD_FOLDER,
-                upload_name
-            )
-
-            if os.path.exists(upload_path):
-                os.remove(upload_path)
-
-            exact_upload = os.path.join(
-                UPLOAD_FOLDER,
-                filename
-            )
-
-            if os.path.exists(exact_upload):
-                os.remove(exact_upload)
-
-        except Exception as e:
-            app.logger.error(str(e))
-
-    return response
-
 
 if __name__ == "__main__":
     app.run(

@@ -1,3 +1,4 @@
 *.exe
 output/*.huff
 output/*_decoded.txt
+__pycache__/
