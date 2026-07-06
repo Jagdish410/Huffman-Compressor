@@ -2,7 +2,7 @@
 
 A full-stack, lossless file compression web application implementing the **Huffman Coding algorithm** in **C++**, with a lightweight **Flask** web interface for seamless compression and decompression.
 
-[🌐 Live Demo](https://huffman-compressor-5rzd.onrender.com) | [👨‍💻 Author Profile](https://github.com/Jagdish410)
+[🌐 Live Demo](https://huffman-compressor-5rzd.onrender.com) 
 
 ---
 
